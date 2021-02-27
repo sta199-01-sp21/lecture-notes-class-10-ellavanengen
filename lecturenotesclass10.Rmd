@@ -1,9 +1,11 @@
 ---
 title: "Introduction to probability"
-author: ""
-date: ""
-output: html_document
-editor_options: 
+author: "Ella van Engen"
+date: "2-27-21"
+output:
+  pdf_document: default
+  html_document: default
+editor_options:
   chunk_output_type: console
 ---
 
@@ -50,16 +52,26 @@ xtabs(~ Treatment + Improved, data = Arthritis) %>%
 
 - How many patients were enrolled in the clinical trial?
 
+84
+
 - What is the probability a randomly selected patient received the placebo?
+
+43/84
 
 - What is the probability a randomly selected patient received the placebo
   and had a marked improvement?
   
+  7/84
+  
 - What is the probability a randomly selected patient received the placebo
   and the treatment?
   
+  0
+  
 - What is the probability a randomly selected patient had some improvement or
   was on the treatment?
+  
+  55/84
 
 ## Using computer simulations to calculate probabilities
 
@@ -75,6 +87,9 @@ marbles <- c("red", "red", "white", "red", "blue", "blue", "red", "blue")
 Suppose we draw a single marble from our imaginary box, where all the marbles
 are equally likely to be selected. What is the probability the marble is blue? 
 How about white?
+
+Blue: 3/8
+White: 1/8
 
 We can simulate this "drawing" with the `sample()` function.
 
@@ -102,6 +117,8 @@ prop.table(counts)
 
 How close is this value to the "true" probability?
 
+Very close due to the law of large numbers.
+
 **To summarize our process:**
 
 1. We defined the sample space for our experiment - `marbles`
@@ -117,6 +134,8 @@ color if we make two draws with replacement? We haven't discussed how to
 compute this theoretically yet, but this is what computers are good at.
 
 Before we do this, what is your guess as to what the probability will be?
+
+25%?
 
 We'll still use `sample()` to run our simulation many times, but we'll
 use `dplyr` functions to compute the relative frequencies.
@@ -158,14 +177,24 @@ Perform a simulation to compute this empirical probability.
 Write down your guess to the answer before you calculate it.
 
 ```{r simulate_rolls}
-
+simulation <- tibble(
+  dice1 = replicate(n=10000, expr = sample(1:6, size=1)),
+  dice2 = replicate(n=10000, expr = sample(1:6, size=1))
+)
 ```
 
 ```{r identify_events}
+simulation <- simulation %>%
+  mutate(roll1 = dice1 ^ 2 == dice2,
+         roll2 = abs(dice1 - dice2) == 4)
+simulation
 
 ```
 
 ```{r summarize_rolls}
+simulation %>%
+  summarize(prob1 = mean(roll1),
+            prob2 = mean(roll2))
 
 ```
 
